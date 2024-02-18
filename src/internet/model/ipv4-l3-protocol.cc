@@ -553,7 +553,10 @@ Ipv4L3Protocol::Receive ( Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t p
   NS_LOG_FUNCTION (this << device << p << protocol << from << to << packetType);
 
   NS_LOG_LOGIC ("Packet from " << from << " received on node " << 
-                m_node->GetId ());
+                m_node->GetId());
+  
+  NS_LOG_INFO ("Packet from " << from << " received on node " << 
+                m_node->GetId() << " Level3. Get off IP header.");
 
 
   int32_t interface = GetInterfaceForDevice(device);
@@ -727,7 +730,7 @@ Ipv4L3Protocol::Send (Ptr<Packet> packet,
                       Ptr<Ipv4Route> route)
 {
   NS_LOG_FUNCTION (this << packet << source << destination << uint32_t (protocol) << route);
-
+  NS_LOG_INFO ("Send in " << m_node->GetId () << " Level3. Add ip header. Source = " << source << ". Destination = " << destination << ".");
   Ipv4Header ipHeader;
   bool mayFragment = true;
   uint8_t ttl = m_defaultTtl;

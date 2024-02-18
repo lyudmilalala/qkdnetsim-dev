@@ -408,6 +408,7 @@ void
 PointToPointNetDevice::Receive (Ptr<Packet> packet)
 {
   NS_LOG_FUNCTION (this << packet);
+  NS_LOG_INFO ("Receive in " << m_node->GetId() << " Level2. Get off link header.");
   uint16_t protocol = 0;
 
   if (m_receiveErrorModel && m_receiveErrorModel->IsCorrupt (packet) ) 
@@ -589,6 +590,8 @@ PointToPointNetDevice::Send (
   NS_LOG_FUNCTION (this << packet << dest << protocolNumber);
   NS_LOG_LOGIC ("p=" << packet << ", dest=" << &dest);
   NS_LOG_LOGIC ("UID is " << packet->GetUid ());
+
+  NS_LOG_INFO ("Send in " << m_node->GetId() << " Level2. Add link header.");
 
   //
   // If IsLinkUp() is false it means there is no channel to send any packet 

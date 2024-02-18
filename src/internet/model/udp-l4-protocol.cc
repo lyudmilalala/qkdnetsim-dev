@@ -320,6 +320,8 @@ UdpL4Protocol::Receive (Ptr<Packet> packet,
                         Ptr<Ipv4Interface> interface)
 {
   NS_LOG_FUNCTION (this << packet << header);
+
+  NS_LOG_INFO ("Receive in " << m_node->GetId() << " Level4. Get off udp header.");
   UdpHeader udpHeader;
   if(Node::ChecksumEnabled ())
     {

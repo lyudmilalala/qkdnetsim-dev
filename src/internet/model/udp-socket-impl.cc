@@ -433,6 +433,7 @@ int
 UdpSocketImpl::Send (Ptr<Packet> p, uint32_t flags)
 {
   NS_LOG_FUNCTION (this << p << flags);
+  NS_LOG_INFO ("Send in " << m_node->GetId() << " Level4, add udp header.");
 
   if (!m_connected)
     {

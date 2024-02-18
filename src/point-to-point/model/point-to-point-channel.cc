@@ -92,6 +92,8 @@ PointToPointChannel::TransmitStart (
   NS_LOG_FUNCTION (this << p << src);
   NS_LOG_LOGIC ("UID is " << p->GetUid () << ")");
 
+  NS_LOG_INFO ("Send in " << m_node->GetId() << " Level1. UID is " << p->GetUid () << ")");
+
   NS_ASSERT (m_link[0].m_state != INITIALIZING);
   NS_ASSERT (m_link[1].m_state != INITIALIZING);
 

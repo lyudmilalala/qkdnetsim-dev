@@ -33,6 +33,12 @@ main (int argc, char *argv[])
   Time::SetResolution (Time::NS);
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpSocketImpl", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpL4Protocol", LOG_LEVEL_INFO);
+  LogComponentEnable ("Ipv4L3Protocol", LOG_LEVEL_INFO);
+  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
+  LogComponentEnable ("PointToPointChannel", LOG_LEVEL_INFO);
+
 
   NodeContainer nodes;
   nodes.Create (2);
