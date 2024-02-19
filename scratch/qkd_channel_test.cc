@@ -88,20 +88,20 @@ int main (int argc, char *argv[])
 {
 
 #if 1
-  LogComponentEnable ("QKD_CHANNEL_TEST", LOG_LEVEL_INFO);
-  LogComponentEnable ("QKDManager", LOG_LEVEL_INFO);
-  LogComponentEnable ("QKDNetDevice", LOG_LEVEL_INFO);
-  LogComponentEnable ("QKDSend", LOG_LEVEL_INFO);
-  LogComponentEnable ("QKDBuffer", LOG_LEVEL_INFO);
-  LogComponentEnable ("QKDCrypto", LOG_LEVEL_WARN);
-  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpSocketImpl", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpL4Protocol", LOG_LEVEL_INFO);
-  LogComponentEnable ("Ipv4L3Protocol", LOG_LEVEL_INFO);
-  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
-  LogComponentEnable ("PointToPointChannel", LOG_LEVEL_INFO);
-  LogComponentEnable ("OlsrRoutingProtocol", LOG_LEVEL_INFO);
+  LogComponentEnable ("QKD_CHANNEL_TEST", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("QKDManager", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("QKDNetDevice", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("QKDSend", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("QKDBuffer", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("QKDCrypto", LOG_LEVEL_WARN, LOG_PREFIX_ALL);
+  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("UdpSocketImpl", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("UdpL4Protocol", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("Ipv4L3Protocol", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("PointToPointChannel", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
+  LogComponentEnable ("OlsrRoutingProtocol", LOG_LEVEL_INFO, LOG_PREFIX_ALL);
 #endif
 
     Packet::EnablePrinting(); 
