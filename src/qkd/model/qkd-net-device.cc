@@ -255,6 +255,8 @@ QKDNetDevice::Send (Ptr<Packet> p, const Address& dest, uint16_t protocolNumber)
     m_macTxTrace (p);
  
     NS_LOG_FUNCTION( this << " sends packet " << p->GetUid() << " of size " << p->GetSize() << "\n" << p);
+
+    NS_LOG_INFO( this << " Sends packet " << p->GetUid() << " of size " << p->GetSize() << " at QKD Level2.");
     
 
     /*
@@ -280,6 +282,8 @@ QKDNetDevice::Receive (Ptr<Packet> p, uint16_t protocol,
                        PacketType packetType)
 {
     NS_LOG_FUNCTION (this << p->GetSize ()  << p );
+
+    NS_LOG_INFO (this << " Receive packet " << p->GetUid() << " of size " << p->GetSize() << " at QKD Level2.");
 
     // 
     // For all kinds of packetType we receive, we hit the promiscuous sniffer

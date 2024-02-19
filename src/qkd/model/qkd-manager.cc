@@ -258,7 +258,7 @@ QKDManager::PopulateLinkStatusesForNeighbors(
     uint8_t tos,
     uint32_t& outputInterface
 ){
-    NS_LOG_DEBUG (this << p << distancesToDestination.size() << (uint32_t) tos);
+    NS_LOG_FUNCTION (this << p << distancesToDestination.size() << (uint32_t) tos);
 
     Ipv4Address bestOutput;     
     return bestOutput;
@@ -350,7 +350,13 @@ QKDManager::VirtualSend (
     uint16_t protocolNumber, 
     uint8_t TxQueueIndex
 ){
-    NS_LOG_FUNCTION ( this << "\t" << p->GetUid() << "\t" << p->GetSize() );
+    NS_LOG_INFO ( this  << "Virtual Send \t"
+        << "Packet:\t" << p->GetUid() << "\t"
+        << "Size:\t" << p->GetSize()
+        << "From:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 () << "\t"
+        << "To:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 () << "\t"
+     );
+        
     NS_LOG_FUNCTION ( this << p );
 
     // packetCopy is unencrypted packet that is used for sniffing in netDevices (to create .pcap records that are readble)
@@ -369,7 +375,7 @@ QKDManager::VirtualSend (
     std::vector<Ptr<Packet> > processedPackets = ProcessOutgoingRequest (SourceDevice, p);
 
 
-    NS_LOG_DEBUG(this << "****** processedPackets size ****** " << processedPackets.size() );
+    NS_LOG_FUNCTION(this << "****** processedPackets size ****** " << processedPackets.size() );
 
     if(processedPackets.size() > 0 ){
         typename std::vector<Ptr<Packet> >::iterator it = processedPackets.begin();
@@ -431,15 +437,14 @@ QKDManager::ForwardToSocket (
         *   packet is processed. Otherwise, packet is silently discarded
         */
         if(CheckForResourcesToProcessThePacket(packet, source) == false){
-            NS_LOG_DEBUG (this << "WE DO NOT HAVE ENOUGH KEY MATERIAL TO PROCESS THIS PACKET!\n Discarding this path!" << "\n");
+            NS_LOG_WARN (this << "WE DO NOT HAVE ENOUGH KEY MATERIAL TO PROCESS THIS PACKET!\n Discarding this path!" << "\n");
             return false;
         }
  
         //if only underlay network
         if( i->second.QKDNetDeviceSrc == 0){
 
-
-            NS_LOG_DEBUG (this 
+            NS_LOG_INFO (this 
                 << "Sending UNICAST to socket\t" << i->second.socket << "\t"  
                 << "IPQKDSrc:\t" << i->second.IPQKDSrc.GetLocal() << "\t" 
                 << "IPQKDDst:\t" << i->second.IPQKDDst.GetLocal() << "\t" 
@@ -449,8 +454,8 @@ QKDManager::ForwardToSocket (
                 << "IPDst:\t" << i->second.IPDst.GetLocal() << "\t" 
                 << "PORT:\t" << i->second.underlayPortNumber << "\t"
                 << "PacketID:\t" << packet->GetUid() << "\t"
-                << "From:\t" << source << "\t"
-                << "To:\t" << destination << "\t"
+                << "From:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 () << "\t"
+                << "To:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 () << "\t"
             );
 
 
@@ -488,8 +493,8 @@ QKDManager::ForwardToSocket (
                 << "IPDst:\t" << i->second.IPDst.GetLocal() << "\t" 
                 << "PORT:\t" << i->second.underlayPortNumber << "\t"
                 << "PacketID:\t" << packet->GetUid() << "\t"
-                << "From:\t" << source << "\t"
-                << "To:\t" << destination << "\t"
+                << "From:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 () << "\t"
+                << "To:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 () << "\t"
             );
 
             NS_LOG_FUNCTION (this << "OVERLAY Network" << i->second.QKDNetDeviceSrc);
@@ -516,7 +521,7 @@ QKDManager::ForwardToSocket (
         }
 
     } else{
-        NS_LOG_INFO(this << "--------- We do not have QKD link to desired destination! ------------");
+        NS_LOG_WARN(this << "--------- We do not have QKD link to desired destination! ------------");
     }
  
     return false;
@@ -530,6 +535,13 @@ QKDManager::VirtualReceiveSimpleNetwork (Ptr<NetDevice> device, Ptr<const Packet
 {
     
     NS_LOG_DEBUG (this << device << packet->GetUid() << packet->GetSize() << protocol << from << to << packetType);    
+    NS_LOG_INFO (this << "Enter VirtualReceiveSimpleNetwork\t"
+        << "Packet:\t" << packet->GetUid() << "\t" 
+        << "Size:\t" << packet->GetSize() << "\t" 
+        << "From:\t" << InetSocketAddress::ConvertFrom(from).GetIpv4 () << "\t"
+        << "To:\t" << InetSocketAddress::ConvertFrom(to).GetIpv4 () << "\t"
+        << "Packet type:\t" << packetType << "\t");    
+
 
     std::map<Address, QKDManager::Connection >::iterator i = FetchConnection (device->GetAddress());
 
@@ -544,7 +556,7 @@ QKDManager::VirtualReceiveSimpleNetwork (Ptr<NetDevice> device, Ptr<const Packet
             //It is possible that routing protocol uses LoopbackRoute. In that case, there is no need to perform
             //decryption/authentication operations
             if(from == to){ 
-                NS_LOG_DEBUG ( this << "#### ROUTING TO MY SELF from " << from << " to " << to);
+                NS_LOG_INFO ( this << "#### ROUTING TO MY SELF from " << from << " to " << to);
                 processedPackets.push_back(packetCopy);
             }else{
                 processedPackets = ProcessIncomingRequest (i->second.IPNetDeviceSrc, packetCopy);
@@ -577,7 +589,7 @@ QKDManager::VirtualReceiveSimpleNetwork (Ptr<NetDevice> device, Ptr<const Packet
                     tc->Receive(device, p, protocol, from, to, packetType);
 
                 }else{
-                    NS_LOG_FUNCTION(this << "Packet is EMPTY!" << p);
+                    NS_LOG_WARN(this << "Packet is EMPTY!" << p);
                 }
             }
         }
@@ -588,6 +600,7 @@ void
 QKDManager::VirtualReceive (Ptr<Socket> socket)
 {       
     NS_LOG_FUNCTION(this << socket);
+    NS_LOG_INFO(this << "Enter VirtualReceive.");
 
     std::map<Address, Connection >::const_iterator i; 
     for (i = m_destinations.begin (); !(i == m_destinations.end ()); i++){        
@@ -1070,12 +1083,12 @@ QKDManager::CheckForResourcesToProcessThePacket(
     const Address sourceAddress
 ){
 
-    NS_LOG_WARN(this << "\t" << p->GetUid() << "\t" << p->GetSize() << "\t" << sourceAddress);
+    NS_LOG_FUNCTION(this << "\t" << p->GetUid() << "\t" << p->GetSize() << "\t" << sourceAddress);
     
     uint32_t tos = FetchPacketTos(p);
     uint32_t TOSband = TosToBand(tos);
 
-    NS_LOG_WARN(this << "\t" << p << "\t" << sourceAddress << "\t" << TOSband);
+    NS_LOG_FUNCTION(this << "\t" << p << "\t" << sourceAddress << "\t" << TOSband);
 
     return CheckForResourcesToProcessThePacket(
         p,
@@ -1091,21 +1104,21 @@ QKDManager::CheckForResourcesToProcessThePacket(
     const uint32_t& TOSband 
 ){
 
-    NS_LOG_WARN(this << "\tp:" << p << "\tsourceAddress:" << sourceAddress << "\tTOSband: " << TOSband); 
+    NS_LOG_FUNCTION(this << "\tp:" << p << "\tsourceAddress:" << sourceAddress << "\tTOSband: " << TOSband); 
 
     std::map<Address, QKDManager::Connection >::iterator i = FetchConnection (sourceAddress);  
     if (i != m_destinations.end ()){
-        NS_LOG_WARN (this << "\t Destination found!");
-        NS_LOG_WARN (this << "\t first:\t" << i->first);
-        NS_LOG_WARN (this << "\t IPNetDeviceSrc:\t" << i->second.IPNetDeviceSrc);
-        NS_LOG_WARN (this << "\t IPNetDeviceDst:\t" << i->second.IPNetDeviceDst);
-        NS_LOG_WARN (this << "\t BufferID:\t" << i->second.bufferId);
+        NS_LOG_FUNCTION (this << "\t Destination found!");
+        NS_LOG_FUNCTION (this << "\t first:\t" << i->first);
+        NS_LOG_FUNCTION (this << "\t IPNetDeviceSrc:\t" << i->second.IPNetDeviceSrc);
+        NS_LOG_FUNCTION (this << "\t IPNetDeviceDst:\t" << i->second.IPNetDeviceDst);
+        NS_LOG_FUNCTION (this << "\t BufferID:\t" << i->second.bufferId);
 
         NS_ASSERT (i->second.buffer != 0);
         NS_ASSERT (i->second.crypto != 0);
 
-        NS_LOG_WARN (this << "\t BufferID:\t" << i->second.buffer);
-        NS_LOG_WARN (this << "\t BufferID:\t" << i->second.buffer->m_bufferID);
+        NS_LOG_FUNCTION (this << "\t BufferID:\t" << i->second.buffer);
+        NS_LOG_FUNCTION (this << "\t BufferID:\t" << i->second.buffer->m_bufferID);
 
         return i->second.crypto->CheckForResourcesToProcessThePacket(
             p,
@@ -1130,12 +1143,12 @@ QKDManager::FetchPacketTos(Ptr<Packet> p){
     if ( p->PeekPacketTag (ipTosTag) )
     {
         tos = ipTosTag.GetTos ();
-        NS_LOG_WARN(this << "\t" << "Found TOS tag using SocketIpTosTag; value:" << "\t" << (uint32_t) tos);
+        NS_LOG_FUNCTION(this << "\t" << "Found TOS tag using SocketIpTosTag; value:" << "\t" << (uint32_t) tos);
 
     }else if( p->PeekPacketTag(temp_qkdNextHopTag) ){ 
 
         tos = temp_qkdNextHopTag.GetTos();
-        NS_LOG_WARN(this << "\t" << "Found TOS tag using QKDInternalTOSTag; value:" << "\t" << (uint32_t) tos);
+        NS_LOG_FUNCTION(this << "\t" << "Found TOS tag using QKDInternalTOSTag; value:" << "\t" << (uint32_t) tos);
 
     }
 
@@ -1151,7 +1164,7 @@ QKDManager::TosToBand(const uint32_t& tos){
     Ptr<PfifoFastQKDPacketFilter> filter = CreateObject<PfifoFastQKDPacketFilter> ();
     uint32_t priority = filter->TosToBand(Socket::IpTos2Priority (tos));
 
-    NS_LOG_WARN( this << "\t tos:" << tos << "\t priority:" << (uint32_t) Socket::IpTos2Priority(tos) << "\t band:" << filter->TosToBand(Socket::IpTos2Priority (tos)) );
+    NS_LOG_FUNCTION( this << "\t tos:" << tos << "\t priority:" << (uint32_t) Socket::IpTos2Priority(tos) << "\t band:" << filter->TosToBand(Socket::IpTos2Priority (tos)) );
 
     /*   
 

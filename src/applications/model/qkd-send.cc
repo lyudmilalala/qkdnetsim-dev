@@ -157,6 +157,7 @@ void
 QKDSend::SendPacket (void)
 {
     NS_LOG_FUNCTION (this);
+    NS_LOG_INFO ("Start send packet by app on Level7.");
 
     Ptr<Packet> packet = Create<Packet> (m_packetSize); 
     packet = m_socket->GetNode()->GetObject<QKDManager> ()->MarkEncrypt  (packet, QKDCRYPTO_OTP, QKDCRYPTO_AUTH_VMAC); 

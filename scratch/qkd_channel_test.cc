@@ -86,6 +86,24 @@ Ratio(uint32_t m_bytes_sent, uint32_t m_packets_sent ){
  
 int main (int argc, char *argv[])
 {
+
+#if 1
+  LogComponentEnable ("QKD_CHANNEL_TEST", LOG_LEVEL_INFO);
+  LogComponentEnable ("QKDManager", LOG_LEVEL_INFO);
+  LogComponentEnable ("QKDNetDevice", LOG_LEVEL_INFO);
+  LogComponentEnable ("QKDSend", LOG_LEVEL_INFO);
+  LogComponentEnable ("QKDBuffer", LOG_LEVEL_INFO);
+  LogComponentEnable ("QKDCrypto", LOG_LEVEL_WARN);
+  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpSocketImpl", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpL4Protocol", LOG_LEVEL_INFO);
+  LogComponentEnable ("Ipv4L3Protocol", LOG_LEVEL_INFO);
+  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
+  LogComponentEnable ("PointToPointChannel", LOG_LEVEL_INFO);
+  LogComponentEnable ("OlsrRoutingProtocol", LOG_LEVEL_INFO);
+#endif
+
     Packet::EnablePrinting(); 
     PacketMetadata::Enable ();
     //
@@ -100,8 +118,8 @@ int main (int argc, char *argv[])
 
     //Enable OLSR
     //AodvHelper routingProtocol;
-    //OlsrHelper routingProtocol;
-    DsdvHelper routingProtocol; 
+    OlsrHelper routingProtocol;
+    // DsdvHelper routingProtocol; 
       
     InternetStackHelper internet;
     internet.SetRoutingHelper (routingProtocol);

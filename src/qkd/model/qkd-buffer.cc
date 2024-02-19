@@ -415,6 +415,14 @@ QKDBuffer::CheckState(void)
 {
     NS_LOG_FUNCTION  (this << m_Mmin << m_Mcurrent << m_McurrentPrevious << m_Mthr << m_Mmax << m_Status << m_previousStatus );
 
+    NS_LOG_INFO  (this << "m_Mmin:\t" << m_Mmin << "\t"
+                    << "m_Mcurrent:\t" << m_Mcurrent << "\t"
+                    << "m_McurrentPrevious:\t" << m_McurrentPrevious << "\t"
+                    << "m_Mthr:\t" << m_Mthr << "\t"
+                    << "m_Mmax:\t" << m_Mmax << "\t"
+                    << "m_Status:\t" << m_Status << "\t"
+                    << "m_previousStatus:\t" << m_previousStatus << "\t");
+
 	if(m_Mcurrent >= m_Mthr){ 
          NS_LOG_FUNCTION  ("case 1");
 		 m_Status = QKDBuffer::QKDSTATUS_READY;
@@ -439,7 +447,7 @@ QKDBuffer::CheckState(void)
     } 
 
     if(m_previousStatus != m_Status){
-        NS_LOG_FUNCTION  (this << "STATUS IS NOT EQUAL TO PREVIOUS STATUS" << m_previousStatus << m_Status);
+        NS_LOG_INFO  (this << "CURRENT STATUS " << m_Status << " IS NOT EQUAL TO PREVIOUS STATUS" << m_previousStatus);
         NS_LOG_FUNCTION  (this << m_Mmin << m_Mcurrent << m_McurrentPrevious << m_Mthr << m_Mmax << m_Status << m_previousStatus );
  
         m_StatusChangeTrace(m_previousStatus);
