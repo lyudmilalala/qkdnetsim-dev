@@ -234,6 +234,8 @@ RoutingProtocol::SetIpv4 (Ptr<Ipv4> ipv4)
 
   m_ipv4 = ipv4;
 
+  NS_LOG_INFO ("Created olsr::RoutingProtocol for node " << m_ipv4->GetObject<Node> ()->GetId ());
+
   m_hnaRoutingTable->SetIpv4 (ipv4);
 }
 

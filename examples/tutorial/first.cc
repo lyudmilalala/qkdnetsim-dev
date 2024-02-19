@@ -38,8 +38,8 @@ main (int argc, char *argv[])
   LogComponentEnable ("Ipv4L3Protocol", LOG_LEVEL_INFO);
   LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
   LogComponentEnable ("PointToPointChannel", LOG_LEVEL_INFO);
-
-
+  
+  
   NodeContainer nodes;
   nodes.Create (2);
 
