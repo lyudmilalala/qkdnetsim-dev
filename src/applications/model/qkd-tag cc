@@ -1,0 +1,66 @@
+#include "qkd-tag.h"
+
+namespace ns3 {
+
+NS_OBJECT_ENSURE_REGISTERED (QKDTag);
+
+TypeId
+QKDTag::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::QKDTag")
+    .SetParent<Tag> ()
+    .AddConstructor<QKDTag> ()
+    .AddAttribute ("StringValue",
+                   "A string tag",
+                   EmptyAttributeValue (),
+                   MakeStringAccessor (&QKDTag::GetStringValue),
+                   MakeStringChecker ())
+  ;
+  return tid;
+}
+
+TypeId
+QKDTag::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+uint32_t
+QKDTag::GetSerializedSize (void) const
+{
+  return m_stringValue.size () + 1; // Include null terminator
+}
+
+void
+QKDTag::Serialize (TagBuffer i) const
+{
+  i.Write (reinterpret_cast<const uint8_t *>(m_stringValue.c_str ()), m_stringValue.size () + 1);
+}
+
+void
+QKDTag::Deserialize (TagBuffer i)
+{
+  char buffer[1024]; // Assuming a maximum string size of 1024
+  i.Read (reinterpret_cast<uint8_t *>(buffer), 1024);
+  m_stringValue = std::string (buffer);
+}
+
+void
+QKDTag::Print (std::ostream &os) const
+{
+  os << "tag = " << m_stringValue;
+}
+
+void
+QKDTag::SetStringValue (const std::string &value)
+{
+  m_stringValue = value;
+}
+
+std::string
+QKDTag::GetStringValue (void) const
+{
+  return m_stringValue;
+}
+
+} // namespace ns3

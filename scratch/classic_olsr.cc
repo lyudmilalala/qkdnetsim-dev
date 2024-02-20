@@ -49,49 +49,9 @@
 #include "ns3/ipv4-static-routing-helper.h"
 #include "ns3/ipv4-list-routing-helper.h"
 
-#include "ns3/qkd-helper.h" 
-#include "ns3/qkd-app-charging-helper.h"
-#include "ns3/qkd-send.h"
-
-#include "ns3/network-module.h"
-#include "ns3/fd-net-device-module.h"
-#include "ns3/internet-apps-module.h"
-
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("QkdOlsrExample");
-
-uint32_t m_bytes_total = 0; 
-uint32_t m_bytes_received = 0; 
-uint32_t m_bytes_sent = 0; 
-uint32_t m_packets_received = 0; 
-double m_time = 0;
-
-void
-SentPacket(std::string context, Ptr<const Packet> p){
-
-    m_bytes_sent += p->GetSize();  
-}
-
-void
-ReceivedPacket(std::string context, Ptr<const Packet> p, const Address& addr){
-     
-    m_bytes_received += p->GetSize(); 
-    m_bytes_total += p->GetSize(); 
-    m_packets_received++;
-
-}
-
-void
-Ratio(uint32_t m_bytes_sent, uint32_t m_packets_sent ){
-    std::cout << "Sent (bytes):\t" <<  m_bytes_sent
-    << "\tReceived (bytes):\t" << m_bytes_received 
-    << "\nSent (Packets):\t" <<  m_packets_sent
-    << "\tReceived (Packets):\t" << m_packets_received 
-    
-    << "\nRatio (bytes):\t" << (float)m_bytes_received/(float)m_bytes_sent
-    << "\tRatio (packets):\t" << (float)m_packets_received/(float)m_packets_sent << "\n";
-}
+NS_LOG_COMPONENT_DEFINE ("ClassicOlsrExample");
 
 int
 main (int argc, char *argv[])
@@ -100,7 +60,7 @@ main (int argc, char *argv[])
   // Set up logs and environmental variables
   //
 
-#if 0
+#if 1
   LogComponentEnable ("QkdOlsrExample", LOG_LEVEL_INFO);
   // LogComponentEnable ("QKDManager", LOG_LEVEL_INFO);
   LogComponentEnable ("QKDNetDevice", LOG_LEVEL_INFO);
@@ -114,7 +74,7 @@ main (int argc, char *argv[])
   LogComponentEnable ("Ipv4L3Protocol", LOG_LEVEL_INFO);
   LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
   LogComponentEnable ("PointToPointChannel", LOG_LEVEL_INFO);
-  LogComponentEnable ("OlsrRoutingProtocol", LOG_LEVEL_INFO);
+  // LogComponentEnable ("OlsrRoutingProtocol", LOG_LEVEL_INFO);
 #endif
 
   // Set up some default values for the simulation.  Use the
@@ -147,13 +107,12 @@ main (int argc, char *argv[])
   //
   // Enable OLSR
   //
-  
   NS_LOG_INFO ("Enabling OLSR Routing.");
   OlsrHelper olsr;
   InternetStackHelper internet;
   internet.SetRoutingHelper (olsr); // has effect on the next Install ()
   internet.Install (c);
-
+  
   //
   // Create channels
   //
@@ -205,121 +164,30 @@ main (int argc, char *argv[])
   ipv4.SetBase ("10.1.34.0", "255.255.255.0");
   Ipv4InterfaceContainer i34 = ipv4.Assign (nd34);
 
-  //
-  // Install QKD modules
-  //
-
-  // Install QKDManager for nodes
-  QKDHelper QHelper;  
-  QHelper.InstallQKDManager (c); 
-
-  // Create QKD connection between nodes 0 and 1 
-  NetDeviceContainer qkdNd01 = QHelper.InstallQKD (
-      nd01.Get(0), nd01.Get(1),
-      1048576,    //min
-      11324620, //thr
-      52428800,   //max
-      52428800     //current    //20485770
-  );
-  // Create QKD connection between nodes 0 and 2 
-  NetDeviceContainer qkdNd02 = QHelper.InstallQKD (
-      nd02.Get(0), nd02.Get(1),
-      1048576,    //min
-      11324620, //thr
-      52428800,   //max
-      52428800     //current    //20485770
-  );
-  // Create QKD connection between nodes 0 and 3 
-  NetDeviceContainer qkdNd03 = QHelper.InstallQKD (
-      nd03.Get(0), nd03.Get(1),
-      1048576,    //min
-      11324620, //thr
-      52428800,   //max
-      52428800     //current    //20485770
-  );
-  // Create QKD connection between nodes 1 and 3 
-  NetDeviceContainer qkdNd13 = QHelper.InstallQKD (
-      nd13.Get(0), nd13.Get(1),
-      1048576,    //min
-      11324620, //thr
-      52428800,   //max
-      52428800     //current    //20485770
-  );
-  // Create QKD connection between nodes 0 and 3 
-  NetDeviceContainer qkdNd23 = QHelper.InstallQKD (
-      nd23.Get(0), nd23.Get(1),
-      1048576,    //min
-      11324620, //thr
-      52428800,   //max
-      52428800     //current    //20485770
-  );
-  // Create QKD connection between nodes 0 and 3 
-  NetDeviceContainer qkdNd34 = QHelper.InstallQKD (
-      nd34.Get(0), nd34.Get(1),
-      1048576,    //min
-      11324620, //thr
-      52428800,   //max
-      52428800     //current    //20485770
-  );
-
-  // Create graph to monitor buffer changes
-  // QHelper.AddGraph(n.Get(0), nd01.Get(0)); //srcNode, destinationAddress, BufferTitle
 
   //
-  // Create Application
+  // Create OnOff Application
   //
   
   NS_LOG_INFO ("Create Applications.");
+  uint16_t port = 9;   // Discard port (RFC 863)
+  
+  // Create the application on n0 to send UDP datagrams 
+  // of size 210 bytes at a rate of 448kb/s from n0 to n4
+  OnOffHelper onoff1 ("ns3::UdpSocketFactory", InetSocketAddress (i34.GetAddress (1), port));
+  onoff1.SetConstantRate (DataRate ("448kb/s"));
+  // onOffApp1.SetAttribute ("AppId", UintegerValue (1234));
+  ApplicationContainer onOffApp1 = onoff1.Install (c.Get (0));
+  onOffApp1.Start (Seconds (10.0));
+  onOffApp1.Stop (Seconds (20.0));
 
-  /* QKD APPs for charing  */
-  QKDAppChargingHelper qkdChargingApp01("ns3::TcpSocketFactory", i01.GetAddress(0),  i01.GetAddress(1), 3072000);
-  ApplicationContainer qkdChrgApps01 = qkdChargingApp01.Install ( nd01.Get(0), nd01.Get(1) );
-  qkdChrgApps01.Start (Seconds (5.));
-  qkdChrgApps01.Stop (Seconds (1500.)); 
-
-  QKDAppChargingHelper qkdChargingApp02("ns3::TcpSocketFactory", i02.GetAddress(0),  i02.GetAddress(1), 3072000);
-  ApplicationContainer qkdChrgApps02 = qkdChargingApp02.Install ( nd02.Get(0), nd02.Get(1) );
-  qkdChrgApps02.Start (Seconds (5.));
-  qkdChrgApps02.Stop (Seconds (1500.)); 
-
-  QKDAppChargingHelper qkdChargingApp03("ns3::TcpSocketFactory", i03.GetAddress(0),  i03.GetAddress(1), 3072000);
-  ApplicationContainer qkdChrgApps03 = qkdChargingApp03.Install ( nd03.Get(0), nd03.Get(1) );
-  qkdChrgApps03.Start (Seconds (5.));
-  qkdChrgApps03.Stop (Seconds (1500.)); 
-
-  QKDAppChargingHelper qkdChargingApp13("ns3::TcpSocketFactory", i13.GetAddress(0),  i13.GetAddress(1), 3072000);
-  ApplicationContainer qkdChrgApps13 = qkdChargingApp13.Install ( nd13.Get(0), nd13.Get(1) );
-  qkdChrgApps13.Start (Seconds (5.));
-  qkdChrgApps13.Stop (Seconds (1500.)); 
-
-  QKDAppChargingHelper qkdChargingApp23("ns3::TcpSocketFactory", i23.GetAddress(0),  i23.GetAddress(1), 3072000);
-  ApplicationContainer qkdChrgApps23 = qkdChargingApp23.Install ( nd23.Get(0), nd23.Get(1) );
-  qkdChrgApps23.Start (Seconds (5.));
-  qkdChrgApps23.Stop (Seconds (1500.)); 
-
-  QKDAppChargingHelper qkdChargingApp34("ns3::TcpSocketFactory", i34.GetAddress(0),  i34.GetAddress(1), 3072000);
-  ApplicationContainer qkdChrgApps34 = qkdChargingApp34.Install ( nd34.Get(0), nd34.Get(1) );
-  qkdChrgApps34.Start (Seconds (5.));
-  qkdChrgApps34.Stop (Seconds (1500.)); 
-
-  /* Create user's traffic between v0 and v1 */
-
-  // Create sink app
-  uint16_t sinkPort = 9090;
-  QKDSinkAppHelper packetSinkHelper ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
-  ApplicationContainer sinkApps = packetSinkHelper.Install (c.Get (4));
-  sinkApps.Start (Seconds (25.));
-  sinkApps.Stop (Seconds (300.));
-    
-  // Create source apps
-  Address sinkAddress (InetSocketAddress (i34.GetAddress(1), sinkPort));
-  Address sourceAddress (InetSocketAddress (i01.GetAddress(0), sinkPort));
-  Ptr<Socket> socket = Socket::CreateSocket (c.Get (0), UdpSocketFactory::GetTypeId ());
-  Ptr<QKDSend> sender = CreateObject<QKDSend> ();
-  sender->Setup (socket, sourceAddress, sinkAddress, 640, 5, DataRate ("160kbps"));
-  c.Get (0)->AddApplication (sender);
-  sender->SetStartTime (Seconds (25.));
-  sender->SetStopTime (Seconds (300.));
+  // Create packet sinks on n4 to receive these packets
+  PacketSinkHelper sink ("ns3::UdpSocketFactory",
+                         InetSocketAddress (Ipv4Address::GetAny (), port));
+  NodeContainer sinks = NodeContainer (c.Get (4), c.Get (1));
+  ApplicationContainer sinkApps = sink.Install (sinks);
+  sinkApps.Start (Seconds (0.0));
+  sinkApps.Stop (Seconds (21.0));
 
   //
   // Enable Pcap collection
@@ -333,14 +201,9 @@ main (int argc, char *argv[])
   // Run simulation
   //
 
-  Config::Connect("/NodeList/*/ApplicationList/*/$ns3::QKDSend/Tx", MakeCallback(&SentPacket));
-  Config::Connect("/NodeList/*/ApplicationList/*/$ns3::QKDSink/Rx", MakeCallback(&ReceivedPacket));
-
   Simulator::Stop (Seconds (30));
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Run ();
-  Ratio(sender->sendDataStats(), sender->sendPacketStats());
-  // QHelper.PrintGraphs();
   Simulator::Destroy ();
   NS_LOG_INFO ("Done.");
 

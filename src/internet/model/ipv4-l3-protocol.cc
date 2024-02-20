@@ -730,7 +730,10 @@ Ipv4L3Protocol::Send (Ptr<Packet> packet,
                       Ptr<Ipv4Route> route)
 {
   NS_LOG_FUNCTION (this << packet << source << destination << uint32_t (protocol) << route);
-  NS_LOG_INFO ("Send in " << m_node->GetId () << " Level3. Add ip header. Source = " << source << ". Destination = " << destination << ".");
+  NS_LOG_INFO ("Send in node = " << m_node->GetId () << " Level3. Add ip header. Source = " << source << ". Destination = " << destination << ".");
+  std::cout << "============ Start print tags ============\n";
+  packet->PrintByteTags(std::cout);
+  std::cout << "============ End print tags ============\n";
   Ipv4Header ipHeader;
   bool mayFragment = true;
   uint8_t ttl = m_defaultTtl;

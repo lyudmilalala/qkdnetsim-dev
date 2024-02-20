@@ -32,6 +32,7 @@
 #include "ns3/trace-source-accessor.h"
 #include "ns3/virtual-udp-socket-factory.h"
 #include "ns3/virtual-tcp-socket-factory.h"
+#include "ns3/qkd-tag.h"
 #include "qkd-send.h"
 
 namespace ns3 {
@@ -162,6 +163,11 @@ QKDSend::SendPacket (void)
     Ptr<Packet> packet = Create<Packet> (m_packetSize); 
     packet = m_socket->GetNode()->GetObject<QKDManager> ()->MarkEncrypt  (packet, QKDCRYPTO_OTP, QKDCRYPTO_AUTH_VMAC); 
     packet = m_socket->GetNode()->GetObject<QKDManager> ()->MarkMaxDelay (packet, m_timeDelayLimit);
+
+    // Add tag
+    QKDTag tag;
+    tag.SetStringValue ("qkdtest");
+    packet->AddPacketTag (tag);
 
     NS_ASSERT (packet != 0);
     NS_LOG_FUNCTION (this << packet->GetUid() << packet->GetSize() );
