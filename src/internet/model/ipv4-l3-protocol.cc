@@ -557,6 +557,11 @@ Ipv4L3Protocol::Receive ( Ptr<NetDevice> device, Ptr<const Packet> p, uint16_t p
   
   NS_LOG_INFO ("Packet from " << from << " received on node " << 
                 m_node->GetId() << " Level3. Get off IP header.");
+  NS_LOG_INFO ("============ Start print tags L3 ============\n");
+  std::ostringstream os;
+  p->PrintByteTags(os);
+  NS_LOG_INFO(os.str());
+  NS_LOG_INFO ("============ End print tags L3 ============\n");
 
 
   int32_t interface = GetInterfaceForDevice(device);
@@ -731,9 +736,6 @@ Ipv4L3Protocol::Send (Ptr<Packet> packet,
 {
   NS_LOG_FUNCTION (this << packet << source << destination << uint32_t (protocol) << route);
   NS_LOG_INFO ("Send in node = " << m_node->GetId () << " Level3. Add ip header. Source = " << source << ". Destination = " << destination << ".");
-  std::cout << "============ Start print tags ============\n";
-  packet->PrintByteTags(std::cout);
-  std::cout << "============ End print tags ============\n";
   Ipv4Header ipHeader;
   bool mayFragment = true;
   uint8_t ttl = m_defaultTtl;

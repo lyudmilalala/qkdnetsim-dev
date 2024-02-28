@@ -437,6 +437,13 @@ TcpL4Protocol::Receive (Ptr<Packet> packet,
 {
   NS_LOG_FUNCTION (this << packet << incomingIpHeader << incomingInterface);
 
+  NS_LOG_INFO ("Receive in " << m_node->GetId() << " Level4. Get off tcp header.");
+  NS_LOG_INFO ("============ Start print tags L4 tcp ============\n");
+  std::ostringstream os;
+  packet->PrintByteTags(os);
+  NS_LOG_INFO(os.str());
+  NS_LOG_INFO ("============ End print tags L4 tcp ============\n");
+
   TcpHeader incomingTcpHeader;
   IpL4Protocol::RxStatus checksumControl;
 

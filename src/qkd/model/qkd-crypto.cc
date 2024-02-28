@@ -328,16 +328,20 @@ QKDCrypto::CheckForResourcesToProcessThePacket(
     uint32_t Mcur = QKDbuffer->GetMcurrent();
 
     NS_LOG_DEBUG ( this 
-    << "\tQKDBuffer: \t" << QKDbufferStatus 
-    << "\tTOSband: \t" << TOSBand
-    << "\tKeySize: \t" << keySize 
-    << "\n");
-    
-    NS_LOG_DEBUG ( this 
+    << "\tBuffer ID:\t" << QKDbuffer->m_bufferID
+    << "\tBuffer m_SrcNodeId:\t" << QKDbuffer->m_SrcNodeId
+    <<"\tBuffer m_DstNodeId:\t" << QKDbuffer->m_DstNodeId
+    << "\tNumber of created buffers:\t" << QKDBuffer::nBuffers
+    << "\tPacketID: \t" << p->GetUid()
+    << "\tshouldEncrypt: \t" << (uint32_t) shouldEncrypt
+    << "\tshouldAuthenticate: \t" << (uint32_t) shouldAuthenticate
+    << "\tQKDBufferStatus: \t" << QKDbufferStatus 
     << "\tQKDBuffer Material: \t" << Mcur  
+    << "\tTOSband: \t" << TOSBand
     << "\tKeySize: \t" << keySize 
     << "\t Enough resources: \t" << (float) (Mcur > keySize)
     << "\n");
+    
 
     //if buffer is empty then only top priority packet can be transmitted
     if(QKDbufferStatus == QKDBuffer::QKDSTATUS_EMPTY && TOSBand != 0){
@@ -362,7 +366,7 @@ QKDCrypto::ProcessOutgoingPacket (
     uint8_t shouldEncrypt = tag.GetEncryptValue();
     uint8_t shouldAuthenticate = tag.GetAuthenticateValue();
 
-    NS_LOG_FUNCTION(this 
+    NS_LOG_DEBUG(this 
         << "Processing outgoing packet \n PacketID:" << p->GetUid() 
         << " of size: " << p->GetSize()
         << "ChannelID:" << channelID
@@ -437,6 +441,7 @@ QKDCrypto::ProcessOutgoingPacket (
                     NS_LOG_WARN ("NO ENOUGH KEY IN THE BUFFER! BUFFER IS EMPTY! ABORT ENCRYPTION and AUTHENTICATION PROCESS");
                     return packetOutput;
                 }else{
+                    NS_LOG_FUNCTION ("Get encrypt key successfully!");
                     cipherText = OTP ( plainText, key );
                     m_encryptionTrace (p);
                 }

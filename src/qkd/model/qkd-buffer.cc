@@ -148,6 +148,11 @@ QKDBuffer::Init(){
     m_c = 0;
     m_lastKeyChargingTimeStamp = 0;
  
+    NS_LOG_DEBUG(this << "Create buffer ID = " << m_bufferID
+    << ", srcNodeId = " << m_SrcNodeId
+    <<", dstNodeId = " << m_DstNodeId
+    << ", number of created buffers = " << nBuffers);
+
     this->CalculateAverageAmountOfTheKeyInTheBuffer();
 }
 
@@ -236,8 +241,8 @@ QKDBuffer::AddNewContent(const uint32_t& keySize)
 
     if(m_Mcurrent + keySize >= m_Mmax){
 
-        NS_LOG_FUNCTION(this << "Buffer is full! Not able to add new " 
-            << keySize << "since the current is " 
+        NS_LOG_INFO(this << " Buffer " << m_bufferID << " is full! Not able to add new " 
+            << keySize << " since the current is " 
             << m_Mcurrent << " and max is " << m_Mmax
         );
         
@@ -250,7 +255,7 @@ QKDBuffer::AddNewContent(const uint32_t& keySize)
           Ptr<QKDKey> key = CreateObject<QKDKey> (m_nextKeyID, keySize);
           m_nextKeyID++;
           m_keys.insert( std::make_pair(  key->GetUid() ,  key) );
-          NS_LOG_FUNCTION (this << "New Key In USE:" << key->GetUid() << m_keys.size() ); 
+          NS_LOG_DEBUG (this << " New Key uid = " << key->GetUid() << " in use in buffer " << m_bufferID << ". Buffer key size = " << m_keys.size() ); 
         }
      
         m_Mcurrent = m_Mcurrent + keySize;
@@ -296,7 +301,7 @@ QKDBuffer::AddNewContent(const uint32_t& keySize)
 
     m_bitsChargedInTimePeriod += keySize;
 
-    NS_LOG_FUNCTION  (this << "New key material added");
+    NS_LOG_FUNCTION  (this << " New key material added");
 
     KeyCalculation();
     return true;
@@ -315,7 +320,8 @@ QKDBuffer::FetchMaxNumberOfRecordedKeyChargingTimePeriods(){
 Ptr<QKDKey>
 QKDBuffer::ProcessOutgoingRequest(const uint32_t& keySize)
 {    
-    NS_LOG_FUNCTION  (this << keySize << m_Mcurrent); 
+    NS_LOG_DEBUG(this << " Buffer ID = " << m_bufferID
+    << ", keySize = " << keySize << ", m_Mcurrent = " << m_Mcurrent); 
 
     if(m_Mcurrent <= keySize)
         return 0;
@@ -415,7 +421,7 @@ QKDBuffer::CheckState(void)
 {
     NS_LOG_FUNCTION  (this << m_Mmin << m_Mcurrent << m_McurrentPrevious << m_Mthr << m_Mmax << m_Status << m_previousStatus );
 
-    NS_LOG_INFO  (this << "m_Mmin:\t" << m_Mmin << "\t"
+    NS_LOG_FUNCTION  (this << "m_Mmin:\t" << m_Mmin << "\t"
                     << "m_Mcurrent:\t" << m_Mcurrent << "\t"
                     << "m_McurrentPrevious:\t" << m_McurrentPrevious << "\t"
                     << "m_Mthr:\t" << m_Mthr << "\t"
@@ -447,7 +453,7 @@ QKDBuffer::CheckState(void)
     } 
 
     if(m_previousStatus != m_Status){
-        NS_LOG_INFO  (this << "CURRENT STATUS " << m_Status << " IS NOT EQUAL TO PREVIOUS STATUS" << m_previousStatus);
+        NS_LOG_DEBUG  (this << "CURRENT STATUS " << m_Status << " IS NOT EQUAL TO PREVIOUS STATUS" << m_previousStatus);
         NS_LOG_FUNCTION  (this << m_Mmin << m_Mcurrent << m_McurrentPrevious << m_Mthr << m_Mmax << m_Status << m_previousStatus );
  
         m_StatusChangeTrace(m_previousStatus);

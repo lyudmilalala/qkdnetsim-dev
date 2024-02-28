@@ -90,22 +90,25 @@ int main (int argc, char *argv[])
 #if 1
   LogComponentEnable ("QKD_CHANNEL_TEST", LOG_LEVEL_INFO);
   LogComponentEnable ("QKDManager", LOG_LEVEL_INFO);
-  LogComponentEnable ("QKDNetDevice", LOG_LEVEL_INFO);
+//   LogComponentEnable ("QKDNetDevice", LOG_LEVEL_INFO);
   LogComponentEnable ("QKDSend", LOG_LEVEL_INFO);
-  LogComponentEnable ("QKDBuffer", LOG_LEVEL_INFO);
-  LogComponentEnable ("QKDCrypto", LOG_LEVEL_WARN);
-  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpSocketImpl", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpL4Protocol", LOG_LEVEL_INFO);
+  LogComponentEnable ("QKDTag", LOG_LEVEL_INFO);
+  LogComponentEnable ("QKDBuffer", LOG_LEVEL_DEBUG);
+  LogComponentEnable ("QKDCrypto", LOG_LEVEL_DEBUG);
+  LogComponentEnable ("QKDChargingApplication", LOG_LEVEL_DEBUG);
+//   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+//   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+//   LogComponentEnable ("UdpSocketImpl", LOG_LEVEL_INFO);
+//   LogComponentEnable ("UdpL4Protocol", LOG_LEVEL_INFO);
+  LogComponentEnable ("TcpL4Protocol", LOG_LEVEL_INFO);
   LogComponentEnable ("Ipv4L3Protocol", LOG_LEVEL_INFO);
-  LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
-  LogComponentEnable ("PointToPointChannel", LOG_LEVEL_INFO);
-  LogComponentEnable ("OlsrRoutingProtocol", LOG_LEVEL_INFO);
+//   LogComponentEnable ("PointToPointNetDevice", LOG_LEVEL_INFO);
+//   LogComponentEnable ("PointToPointChannel", LOG_LEVEL_INFO);
+//   LogComponentEnable ("OlsrRoutingProtocol", LOG_LEVEL_INFO);
 #endif
 
     Packet::EnablePrinting(); 
-    PacketMetadata::Enable ();
+    PacketMetadata::Enable();
     //
     // Explicitly create the nodes required by the topology (shown above).
     //
@@ -164,6 +167,7 @@ int main (int argc, char *argv[])
     QHelper.InstallQKDManager (n); 
  
 
+    // here size are bits size (not num of keys), a packet will decrease buffer size m_Mcurrent by packet_size*8 when OTP
     //create QKD connection between nodes 0 and 1 
     NetDeviceContainer qkdNetDevices01 = QHelper.InstallQKD (
         d0d1.Get(0), d0d1.Get(1),
@@ -220,7 +224,7 @@ int main (int argc, char *argv[])
     Ptr<Socket> socket = Socket::CreateSocket (n.Get (0), UdpSocketFactory::GetTypeId ());
  
     Ptr<QKDSend> app = CreateObject<QKDSend> ();
-    app->Setup (socket, sourceAddress, sinkAddress, 640, 5, DataRate ("160kbps"));
+    app->Setup (socket, sourceAddress, sinkAddress, 640, 5, DataRate ("160Kbps"));
     n.Get (0)->AddApplication (app);
     app->SetStartTime (Seconds (25.));
     app->SetStopTime (Seconds (300.));

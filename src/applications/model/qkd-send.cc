@@ -158,6 +158,7 @@ void
 QKDSend::SendPacket (void)
 {
     NS_LOG_FUNCTION (this);
+    
     NS_LOG_INFO ("Start send packet by app on Level7.");
 
     Ptr<Packet> packet = Create<Packet> (m_packetSize); 
@@ -168,6 +169,12 @@ QKDSend::SendPacket (void)
     QKDTag tag;
     tag.SetStringValue ("qkdtest");
     packet->AddPacketTag (tag);
+    bool found = packet->PeekPacketTag(peekedTag);
+    if (found) {
+        NS_LOG_INFO("Tag added successfully.");
+    } else {
+        NS_LOG_WARN("Failed to add tag to the packet.");
+    }
 
     NS_ASSERT (packet != 0);
     NS_LOG_FUNCTION (this << packet->GetUid() << packet->GetSize() );
@@ -180,7 +187,7 @@ QKDSend::SendPacket (void)
     if ( m_nPacketSize == 0 ||  m_dataSent < m_nPacketSize )
       ScheduleTx ();
 
-    NS_LOG_FUNCTION(this << "m_nPacketSize:" << m_nPacketSize << "m_dataSent:" << m_dataSent << "m_nPacketSize:" << m_nPacketSize);
+    NS_LOG_FUNCTION("m_dataSent:" << m_dataSent << "m_nPacketSize:" << m_nPacketSize);
 }
 
 uint32_t

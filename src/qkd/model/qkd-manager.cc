@@ -322,14 +322,14 @@ QKDManager::GetSourceNetDevice (const Address address){
 
         //if only underlay network
         if( j->second.QKDNetDeviceSrc == 0 && j->second.IPNetDeviceSrc->GetAddress() == address){ 
-            NS_LOG_FUNCTION (this << "\t Destination address found:" << j->second.IPNetDeviceSrc->GetAddress() );
-            NS_LOG_FUNCTION (this << "Src" << j->second.IPSrc.GetLocal() << "Dst" << j->second.IPDst.GetLocal() );
+            NS_LOG_FUNCTION (this << " Destination address found:" << j->second.IPNetDeviceSrc->GetAddress() );
+            NS_LOG_FUNCTION (this << " Src" << j->second.IPSrc.GetLocal() << "Dst" << j->second.IPDst.GetLocal() );
             return j->second.IPNetDeviceSrc;
 
         //if overlay network
         }else if( j->second.QKDNetDeviceSrc != 0 && j->second.QKDNetDeviceSrc->GetAddress() == address){ 
-            NS_LOG_FUNCTION (this << "\t Destination address found:" << j->second.QKDNetDeviceSrc->GetAddress() ); 
-            NS_LOG_FUNCTION (this << "Src" << j->second.IPQKDSrc.GetLocal() << "Dst" << j->second.IPQKDDst.GetLocal() );
+            NS_LOG_FUNCTION (this << " Destination address found:" << j->second.QKDNetDeviceSrc->GetAddress() ); 
+            NS_LOG_FUNCTION (this << " Src" << j->second.IPQKDSrc.GetLocal() << "Dst" << j->second.IPQKDDst.GetLocal() );
             return j->second.QKDNetDeviceSrc;
         }
     }
@@ -350,11 +350,11 @@ QKDManager::VirtualSend (
     uint16_t protocolNumber, 
     uint8_t TxQueueIndex
 ){
-    NS_LOG_INFO ( this  << "Virtual Send \t"
-        << "Packet:\t" << p->GetUid() << "\t"
-        << "Size:\t" << p->GetSize()
-        << "From:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 () << "\t"
-        << "To:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 () << "\t"
+    NS_LOG_INFO ( this  << "\tVirtual Send \t"
+        << "\tPacketID:\t" << p->GetUid() << "\t"
+        << "\tSize:\t" << p->GetSize() << "\t"
+        << "\tFrom:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 () << "\t"
+        << "\tTo:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 () << "\t"
      );
         
     NS_LOG_FUNCTION ( this << p );
@@ -386,7 +386,7 @@ QKDManager::VirtualSend (
                 continue;
             else {
                 
-                NS_LOG_DEBUG (this << "\t" 
+                NS_LOG_FUNCTION (this << "\t" 
                     << packet->GetUid() 
                     << packet->GetSize() << "\t" 
                     << source <<  "\t" 
@@ -398,7 +398,7 @@ QKDManager::VirtualSend (
         } 
     }else{
         
-        NS_LOG_DEBUG (this << "\t" 
+        NS_LOG_FUNCTION (this << "\t" 
             << p->GetUid() 
             << p->GetSize() << "\t" 
             << source <<  "\t" 
@@ -406,7 +406,7 @@ QKDManager::VirtualSend (
         );
 
     }
-    NS_LOG_DEBUG(this << "****** WE DO NOT KNOW WHERE TO FORWARD THIS PACKET ******" << p << source << destination);
+    NS_LOG_DEBUG(this << " ****** WE DO NOT KNOW WHERE TO FORWARD THIS PACKET ******" << p << source << destination);
     return false; 
 }
 
@@ -433,11 +433,11 @@ QKDManager::ForwardToSocket (
 
         /**
         *   Since some routing protocols might not be aware of QKDbuffers and QKD materials in these buffers, 
-        *   we need to analyze the status of QKD buffers priori processing of packet. If there is enough key material
+        *   we need to analyze the status of QKD buffers priority processing of packet. If there is enough key material
         *   packet is processed. Otherwise, packet is silently discarded
         */
         if(CheckForResourcesToProcessThePacket(packet, source) == false){
-            NS_LOG_WARN (this << "WE DO NOT HAVE ENOUGH KEY MATERIAL TO PROCESS THIS PACKET!\n Discarding this path!" << "\n");
+            NS_LOG_WARN (this << " WE DO NOT HAVE ENOUGH KEY MATERIAL TO PROCESS THIS PACKET!\n Discarding this path!" << "\n");
             return false;
         }
  
@@ -445,26 +445,26 @@ QKDManager::ForwardToSocket (
         if( i->second.QKDNetDeviceSrc == 0){
 
             NS_LOG_INFO (this 
-                << "Sending UNICAST to socket\t" << i->second.socket << "\t"  
-                << "IPQKDSrc:\t" << i->second.IPQKDSrc.GetLocal() << "\t" 
-                << "IPQKDDst:\t" << i->second.IPQKDDst.GetLocal() << "\t" 
-                << "IPNetDeviceSrc:\t" << i->second.IPNetDeviceSrc->GetAddress() << "\t" 
-                << "IPNetDeviceDst:\t" << i->second.IPNetDeviceDst->GetAddress() << "\t" 
-                << "IPSrc:\t" << i->second.IPSrc.GetLocal() << "\t" 
-                << "IPDst:\t" << i->second.IPDst.GetLocal() << "\t" 
-                << "PORT:\t" << i->second.underlayPortNumber << "\t"
-                << "PacketID:\t" << packet->GetUid() << "\t"
-                << "From:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 () << "\t"
-                << "To:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 () << "\t"
+                << "\tSending UNICAST to socket\t" << i->second.socket 
+                << "\tIPQKDSrc:\t" << i->second.IPQKDSrc.GetLocal()
+                << "\tIPQKDDst:\t" << i->second.IPQKDDst.GetLocal() 
+                << "\tIPNetDeviceSrc:\t" << i->second.IPNetDeviceSrc->GetAddress() 
+                << "\tIPNetDeviceDst:\t" << i->second.IPNetDeviceDst->GetAddress() 
+                << "\tIPSrc:\t" << i->second.IPSrc.GetLocal() 
+                << "\tIPDst:\t" << i->second.IPDst.GetLocal()
+                << "\tPORT:\t" << i->second.underlayPortNumber
+                << "\tPacketID:\t" << packet->GetUid()
+                << "\tFrom:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 ()
+                << "\tTo:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 ()
             );
 
 
-            NS_LOG_DEBUG (this << "SINGLE TCP/IP Network" << i->second.QKDNetDeviceSrc);
+            NS_LOG_DEBUG (this << " SINGLE TCP/IP Network" << i->second.QKDNetDeviceSrc);
 
             Ptr<NetDeviceQueueInterface> m_devQueueIface = i->second.IPNetDeviceSrc->GetObject<NetDeviceQueueInterface> ();
             if ( m_devQueueIface!= 0 &&  m_devQueueIface->GetTxQueue (TxQueueIndex)->IsStopped ())
             { 
-                NS_LOG_DEBUG (this << "NetDevice " << i->second.IPNetDeviceSrc << " queue is stopped! Aborting!");             
+                NS_LOG_DEBUG (this << " NetDevice " << i->second.IPNetDeviceSrc << " queue is stopped! Aborting!");             
                 return false;
                 
             }else{ 
@@ -476,7 +476,7 @@ QKDManager::ForwardToSocket (
                     protocolNumber
                 );
 
-                NS_LOG_DEBUG(this << "******PACKET LEFT SINGLE TCP/IP NETWORK (UNICAST)******");
+                NS_LOG_DEBUG(this << " ******PACKET LEFT SINGLE TCP/IP NETWORK (UNICAST)******");
 
             }
             
@@ -486,15 +486,15 @@ QKDManager::ForwardToSocket (
         }else{
 
             NS_LOG_INFO (this 
-                << "Sending UNICAST to socket\t" << i->second.socket << "\t"  
-                << "IPQKDSrc:\t" << i->second.IPQKDSrc.GetLocal() << "\t" 
-                << "IPQKDDst:\t" << i->second.IPQKDDst.GetLocal() << "\t" 
-                << "IPSrc:\t" << i->second.IPSrc.GetLocal() << "\t" 
-                << "IPDst:\t" << i->second.IPDst.GetLocal() << "\t" 
-                << "PORT:\t" << i->second.underlayPortNumber << "\t"
-                << "PacketID:\t" << packet->GetUid() << "\t"
-                << "From:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 () << "\t"
-                << "To:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 () << "\t"
+                << "\tSending UNICAST to socket\t" << i->second.socket 
+                << "\tIPQKDSrc:\t" << i->second.IPQKDSrc.GetLocal() 
+                << "\tIPQKDDst:\t" << i->second.IPQKDDst.GetLocal() 
+                << "\tIPSrc:\t" << i->second.IPSrc.GetLocal() 
+                << "\tIPDst:\t" << i->second.IPDst.GetLocal() 
+                << "\tPORT:\t" << i->second.underlayPortNumber
+                << "\tPacketID:\t" << packet->GetUid() 
+                << "\tFrom:\t" << InetSocketAddress::ConvertFrom(source).GetIpv4 ()
+                << "\tTo:\t" << InetSocketAddress::ConvertFrom(destination).GetIpv4 () 
             );
 
             NS_LOG_FUNCTION (this << "OVERLAY Network" << i->second.QKDNetDeviceSrc);
@@ -534,13 +534,13 @@ QKDManager::VirtualReceiveSimpleNetwork (Ptr<NetDevice> device, Ptr<const Packet
             )
 {
     
-    NS_LOG_DEBUG (this << device << packet->GetUid() << packet->GetSize() << protocol << from << to << packetType);    
-    NS_LOG_INFO (this << "Enter VirtualReceiveSimpleNetwork\t"
-        << "Packet:\t" << packet->GetUid() << "\t" 
-        << "Size:\t" << packet->GetSize() << "\t" 
-        << "From:\t" << InetSocketAddress::ConvertFrom(from).GetIpv4 () << "\t"
-        << "To:\t" << InetSocketAddress::ConvertFrom(to).GetIpv4 () << "\t"
-        << "Packet type:\t" << packetType << "\t");    
+    // NS_LOG_DEBUG (this << device << packet->GetUid() << packet->GetSize() << protocol << from << to << packetType);    
+    NS_LOG_INFO ("\tEnter VirtualReceiveSimpleNetwork\t"
+        << "PacketID:\t" << packet->GetUid() << "\t" 
+        << "\tSize:\t" << packet->GetSize() << "\t" 
+        << "\tFrom:\t" << InetSocketAddress::ConvertFrom(from).GetIpv4 () << "\t"
+        << "\tTo:\t" << InetSocketAddress::ConvertFrom(to).GetIpv4 () << "\t"
+        << "\tPacket type:\t" << packetType << "\t");    
 
 
     std::map<Address, QKDManager::Connection >::iterator i = FetchConnection (device->GetAddress());
@@ -562,7 +562,7 @@ QKDManager::VirtualReceiveSimpleNetwork (Ptr<NetDevice> device, Ptr<const Packet
                 processedPackets = ProcessIncomingRequest (i->second.IPNetDeviceSrc, packetCopy);
             }
 
-            NS_LOG_DEBUG ( this << "We have in total " << processedPackets.size() << " decrypted packets!" );
+            NS_LOG_DEBUG ( this << " We have in total " << processedPackets.size() << " decrypted packets!" );
             
             //ForwardUP
             typename std::vector<Ptr<Packet> >::iterator it = processedPackets.begin();
@@ -571,7 +571,7 @@ QKDManager::VirtualReceiveSimpleNetwork (Ptr<NetDevice> device, Ptr<const Packet
                 Ptr<const Packet> p = *it;
                 if(p != 0){
 
-                    NS_LOG_DEBUG (this << "Starting forward up process for packet:" << p << " pid " << p->GetUid() << " of size " << p->GetSize());
+                    NS_LOG_DEBUG (this << " Starting forward up process for packet:" << p << " pid " << p->GetUid() << " of size " << p->GetSize());
                     /*
                     std::cout << "--------QKDManager::VirtualReceiveSimpleNetwork-----------\n";   
                     std::cout << p->GetUid() << "\t" << p->GetSize() << "\n";
@@ -901,11 +901,12 @@ QKDManager::ProcessOutgoingRequest (Ptr<NetDevice> dev, Ptr<Packet> p)
     std::vector<Ptr<Packet> > processedPackets;
     QKDInternalTag tag;
     if(p->PeekPacketTag(tag)) {
+        NS_LOG_DEBUG (this << " Already have tag.")
         //p->RemovePacketTag(tag);
     } else { 
         NS_LOG_FUNCTION ( 
-            this << "No QKDInternalTag detected!" 
-            << "No encryption/authentication needed (no MarkEncryt or MarkAuthenticated called before)" 
+            this << " No QKDInternalTag detected!" 
+            << " No encryption/authentication needed (no MarkEncrypt or MarkAuthenticated called before)" 
         );
         tag.SetAuthenticateValue ( 0 ); 
         tag.SetEncryptValue ( 0 );
@@ -919,10 +920,10 @@ QKDManager::ProcessOutgoingRequest (Ptr<NetDevice> dev, Ptr<Packet> p)
     std::cout << "\n###################################################\n";
     */
 
-    NS_LOG_FUNCTION(this << "Packet is ready to be ecrypted/authenticated!" << p->GetUid() << p);  
-    NS_LOG_FUNCTION(this << "Packet to be encrypted:"      << (uint32_t) tag.GetEncryptValue() ); 
-    NS_LOG_FUNCTION(this << "Packet to be authenticated:"  << (uint32_t) tag.GetAuthenticateValue() ); 
-    NS_LOG_FUNCTION(this << "Packet (maxDelay):"  << (uint32_t) tag.GetMaxDelayValue() ); 
+    NS_LOG_FUNCTION(this << " Packet is ready to be ecrypted/authenticated! ID = " << p->GetUid() << p);  
+    NS_LOG_FUNCTION(this << " Packet to be encrypted: "      << (uint32_t) tag.GetEncryptValue() ); 
+    NS_LOG_FUNCTION(this << " Packet to be authenticated: "  << (uint32_t) tag.GetAuthenticateValue() ); 
+    NS_LOG_FUNCTION(this << " Packet (maxDelay): "  << (uint32_t) tag.GetMaxDelayValue() ); 
     
     Ptr<Packet> packet = p->Copy ();
     std::map<Address, Connection >::const_iterator i; 
@@ -934,13 +935,11 @@ QKDManager::ProcessOutgoingRequest (Ptr<NetDevice> dev, Ptr<Packet> p)
             i->second.QKDNetDeviceSrc == dev
         ){ 
 
-            NS_LOG_FUNCTION (this 
-                << "Sending from " 
-                << i->second.IPQKDSrc  
-                << " to " 
-                << i->second.IPQKDDst 
-                << " using buffer: " 
-                << i->second.buffer->m_bufferID
+            NS_LOG_DEBUG (this 
+                << " Sending packet ID = " << packet->GetUid()
+                << " from " << i->second.IPQKDSrc  
+                << " to " << i->second.IPQKDDst 
+                << " using buffer: " << i->second.buffer->m_bufferID
             );
 
             if(i->second.crypto == 0)
@@ -951,7 +950,7 @@ QKDManager::ProcessOutgoingRequest (Ptr<NetDevice> dev, Ptr<Packet> p)
                 i->second.buffer,
                 i->second.channelID
             );                
-            NS_LOG_FUNCTION(this << "Encryption/Authentication completed!" 
+            NS_LOG_FUNCTION(this << " Encryption/Authentication completed!" 
                 << "PacketID:"
                 << packet->GetUid()
                 << "PacketSize:"

@@ -1095,7 +1095,7 @@ void QKDChargingApplication::PrepareOutput (std::string key, uint32_t value)
     NS_LOG_DEBUG (this <<  Simulator::Now () << key << value);     
  
     std::ostringstream msg; 
-    msg << key << ":" << value << ";";
+    msg << key << ":" << value << ";";  // craete the request for trigger ADD_KEY, key size = value
 
     //playing with packet size to introduce some randomness 
     msg << std::string( m_random->GetValue (m_pktSize, m_pktSize*1.5), '0');
@@ -1617,9 +1617,9 @@ void QKDChargingApplication::HandleReadTemp8 (Ptr<Socket> socket)
 
 void QKDChargingApplication::ProcessIncomingPacket(Ptr<Packet> packet, Ptr<Socket> socket){
 
-    NS_LOG_DEBUG(this << "\nProcessIncomingPacket!\t" << m_sendDevice->GetAddress() << "\t" << m_sinkDevice->GetAddress() );
+    NS_LOG_FUNCTION(this << "\nProcessIncomingPacket!\t" << m_sendDevice->GetAddress() << "\t" << m_sinkDevice->GetAddress() );
  
-    NS_LOG_DEBUG (this << packet << "\tPACKETID: " << packet->GetUid() << " of size: " << packet->GetSize() );
+    NS_LOG_FUNCTION (this << packet << "\tPACKETID: " << packet->GetUid() << " of size: " << packet->GetSize() );
     m_packetNumber++;
 
     /**
@@ -1632,12 +1632,12 @@ void QKDChargingApplication::ProcessIncomingPacket(Ptr<Packet> packet, Ptr<Socke
 
     uint32_t packetValue;  
     if(s.size() > 5){
-
+      // readout packet label and size value
       char labelChar[6];
       sscanf(s.c_str(), "%6[^;]:%d;", labelChar, &packetValue);
       std::string label (labelChar); 
 
-      NS_LOG_DEBUG (this << "\tLABEL:\t" <<  label << "\tPACKETVALUE:\t" << packetValue);
+      NS_LOG_DEBUG (this << "\tPACKETID:\t" << packet->GetUid()  << "\tLABEL:\t" <<  label << "\tPACKETVALUE:\t" << packetValue);
 
       if(label == "ADDKEY"){
         m_packetNumber = 0;
@@ -1654,7 +1654,7 @@ void QKDChargingApplication::ProcessIncomingPacket(Ptr<Packet> packet, Ptr<Socke
             << "\tPACKETVALUE:\t" << packetValue << "\n";
             */
             
-            NS_LOG_DEBUG(this << "\t" << m_sendDevice->GetAddress() << "\t" << m_sinkDevice->GetAddress() );
+            NS_LOG_FUNCTION(this << "\t" << m_sendDevice->GetAddress() << "\t" << m_sinkDevice->GetAddress() );
             GetNode ()->GetObject<QKDManager> ()->AddNewKeyMaterial(m_sendDevice->GetAddress(), packetValue);
             //m_maxPackets = m_random->GetValue (m_maxPackets * 0.8, m_maxPackets * 1.2);
         }
